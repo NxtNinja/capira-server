@@ -63,11 +63,11 @@ app.get("/debug/test-cookie", (req, res) => {
   console.log("Debug: Origin:", req.headers.origin);
   console.log("Debug: Headers:", req.headers);
   
-  // Set a test cookie
+  // Set a test cookie with cross-domain support
   res.cookie("test-token", "debug-value", {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    secure: true, // Always true for cross-domain
+    sameSite: "none", // Required for cross-domain
     maxAge: 5 * 60 * 1000, // 5 minutes
   });
   
