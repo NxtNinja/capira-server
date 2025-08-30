@@ -10,7 +10,6 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "moduleResolution": "node",
-    "types": ["node", "express"],
     "noImplicitAny": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true
