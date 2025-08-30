@@ -9,7 +9,12 @@ import morgan from "morgan";
 
 const app = express();
 app.use(helmet());
-app.use(cors({ origin: "*", credentials: true }));
+app.use(
+  cors({
+    origin: "https://divine-shortly-buck.ngrok-free.app",
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(cookieParser());
 app.use(morgan("dev"));
