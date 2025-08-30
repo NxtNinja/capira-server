@@ -4,17 +4,24 @@ import authRoutes from "./modules/auth/auth.routes";
 import userRoutes from "./modules/users/user.routes";
 import { errorHandler } from "./middleware/errorHandler";
 import cookieParser from "cookie-parser";
+import helmet from "helmet";
+import morgan from "morgan";
 
 const app = express();
-app.use(
-  cors({
-    origin: "http://localhost:3000",
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE"],
-  })
-);
+app.use(helmet());
+app.use(cors({ origin: "*", credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
+app.use(morgan("dev"));
+
+// ✅ Health / Keep-Alive endpoint
+app.get("/api/health", (_req, res) => {
+  res.status(200).json({
+    status: "ok",
+    message: "Server is alive 🚀",
+    timestamp: new Date().toISOString(),
+  });
+});
 
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
