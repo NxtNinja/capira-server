@@ -1,0 +1,96 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// User accounts
+model User {
+  id        String        @id @default(cuid())
+  name      String
+  email     String        @unique
+  password  String
+  income    Float?        // base monthly income
+  goal      String?       // e.g. "Save ₹5L in 2 years"
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  transactions Transaction[]
+  budgets      Budget[]
+  reports      Report[]
+  wealthRules  WealthRule[]
+}
+
+/// Income & expenses
+model Transaction {
+  id        String   @id @default(cuid())
+  type      TransactionType
+  category  String
+  amount    Float
+  note      String?         // optional description
+  date      DateTime        @default(now())
+  user      User            @relation(fields: [userId], references: [id])
+  userId    String
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+/// Budgets (e.g. 50/30/20 or custom per category)
+model Budget {
+  id          String   @id @default(cuid())
+  category    String
+  limitAmount Float
+  period      BudgetPeriod
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String
+}
+
+enum BudgetPeriod {
+  MONTHLY
+  YEARLY
+}
+
+/// Monthly/Yearly summary reports
+model Report {
+  id           String   @id @default(cuid())
+  month        String   // format YYYY-MM
+  totalIncome  Float
+  totalExpense Float
+  totalSavings Float
+  user         User     @relation(fields: [userId], references: [id])
+  userId       String
+}
+
+/// Wealth rules applied per user (Millionaire Habits)
+model WealthRule {
+  id        String       @id @default(cuid())
+  type      WealthRuleType
+  status    RuleStatus   @default(ACTIVE)
+  createdAt DateTime     @default(now())
+  user      User         @relation(fields: [userId], references: [id])
+  userId    String
+}
+
+enum WealthRuleType {
+  PAY_YOURSELF_FIRST   // auto allocate 10-20% savings
+  FIFTY_THIRTY_TWENTY  // default budgeting rule
+  EXPENSE_LEAK_DETECT  // detect recurring/wasteful spends
+  COMPOUNDING_VISUAL   // show compounding projections
+}
+
+enum RuleStatus {
+  ACTIVE
+  INACTIVE
+}
