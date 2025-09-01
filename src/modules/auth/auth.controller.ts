@@ -18,22 +18,9 @@ export async function login(req: Request, res: Response) {
   const { email, password } = req.body;
   const { user, token } = await authService.login(email, password);
 
-  // Set HttpOnly cookie with cross-domain support
-  res.cookie("token", token, {
-    httpOnly: true,
-    secure: true, // Always true for cross-domain
-    sameSite: "none", // Required for cross-domain
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    // Don't set domain - let browser handle it
-  });
-
   res.json({
     message: "Login successful",
     user: { id: user.id, email: user.email },
+    token: token, // Also return token in response body for cross-domain compatibility
   });
-}
-
-export async function logout(_req: Request, res: Response) {
-  res.clearCookie("token");
-  res.json({ message: "Logged out successfully" });
 }
