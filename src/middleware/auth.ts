@@ -11,10 +11,16 @@ export function authMiddleware(
   _res: Response,
   next: NextFunction
 ) {
-  const token = req.cookies?.token;
+  const authHeader = req.headers.authorization;
+  
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return next(new AppError("Not authenticated - Bearer token required", 401));
+  }
+  
+  const token = authHeader.substring(7); // Remove 'Bearer ' prefix
 
   if (!token) {
-    return next(new AppError("Not authenticated", 401));
+    return next(new AppError("Not authenticated - Token missing", 401));
   }
 
   try {
